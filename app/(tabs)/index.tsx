@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import "../../global.css"
 import { supabase } from '../../lib/supabase'
 import Auth from '../../components/Auth' 
 import Account from '../../components/Account'

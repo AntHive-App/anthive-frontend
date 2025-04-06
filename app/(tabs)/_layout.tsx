@@ -7,7 +7,6 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 
 export default function TabLayout() {
 
-
   return (
     <Tabs
       screenOptions={{
