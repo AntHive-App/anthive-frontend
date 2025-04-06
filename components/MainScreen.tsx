@@ -109,7 +109,7 @@ export default function MainScreen({ session }: { session: Session }) {
       </View>
 
       {/* Create Folder Button - Fixed at bottom */}
-      <View className="absolute bottom-0 left-0 right-0 p-4 items-center bg-gray-100 z-10">
+      <View className="absolute bottom-8 left-0 right-0 p-4 items-center bg-gray-100 z-10">
         <View className="w-40">
           <Button
             label="CREATE A FOLDER"
