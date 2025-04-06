@@ -38,8 +38,8 @@ export default function EmailForm() {
       <StatusBar barStyle="light-content" backgroundColor="#14001D" />
       <SafeAreaView className="flex-1">
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-5 pt-20">
-          <Text className="text-white text-3xl font-bold">Let's Login</Text>
-          <Text className="text-gray-400 mt-1 mb-8">And notes your idea</Text>
+          <Text className="text-white text-3xl font-bold">Welcome to AntHive</Text>
+          <Text className="text-gray-400 mt-1 mb-8">Create notes and collaborate with friends</Text>
 
           <Text className="text-white text-xs font-bold mt-2 mb-1">EMAIL ADDRESS</Text>
           <TextInput
@@ -66,7 +66,7 @@ export default function EmailForm() {
           <TouchableOpacity
             onPress={() => handleAuth('signIn')}
             disabled={loading}
-            className="bg-gray-200 py-3.5 rounded-xl mt-8"
+            className="bg-gray-200 py-3.5 rounded-xl mt-8 shadow-[0_8px_0_rgb(180,180,180,0.5)]"
           >
             <Text className="text-center font-bold text-black">SIGN IN</Text>
           </TouchableOpacity>
@@ -74,7 +74,7 @@ export default function EmailForm() {
           <TouchableOpacity
             onPress={() => handleAuth('signUp')}
             disabled={loading}
-            className="bg-gray-200 py-3.5 rounded-xl mt-4 mb-10"
+            className="bg-gray-200 py-3.5 rounded-xl mt-4 mb-10 shadow-[0_8px_0_rgb(180,180,180,0.5)]"
           >
             <Text className="text-center font-bold text-black">SIGN UP</Text>
           </TouchableOpacity>
