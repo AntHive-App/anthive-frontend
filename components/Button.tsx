@@ -1,5 +1,5 @@
-import React from 'react';
-import { TouchableOpacity, Text } from 'react-native';
+import React, { useState } from 'react';
+import { TouchableOpacity, Text, Platform } from 'react-native';
 import tw from 'twrnc';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
@@ -19,6 +19,8 @@ export default function Button({
   label,
   style = {}
 }: ButtonProps) {
+  const [isPressed, setIsPressed] = useState(false);
+
   const getStyles = (variant: ButtonVariant) => {
     const baseStyles = tw`py-3.5 rounded-xl`;
     
@@ -34,29 +36,27 @@ export default function Button({
       outline: tw`text-sky-400 font-bold text-center`
     };
 
-    // Shadow styles need to be applied separately since they're not supported in tw
-    const shadowStyles = {
-      primary: {
-        shadowColor: '#38bdf8',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.5,
-        shadowRadius: 0,
-        elevation: 4
-      },
-      secondary: {
-        shadowColor: '#b4b4b4',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.5,
-        shadowRadius: 0,
-        elevation: 4
-      },
-      outline: {
-        shadowColor: '#38bdf8',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 0,
-        elevation: 4
+    const getShadowStyles = (color: string, opacity: number) => {
+      if (Platform.OS === 'android') {
+        return {
+          elevation: isPressed ? 0 : 4,
+        };
       }
+      return {
+        shadowColor: color,
+        shadowOffset: {
+          width: 0,
+          height: isPressed ? 0 : 4,
+        },
+        shadowOpacity: isPressed ? 0 : opacity,
+        shadowRadius: 0,
+      };
+    };
+
+    const shadowStyles = {
+      primary: getShadowStyles('#38bdf8', 0.5),
+      secondary: getShadowStyles('#b4b4b4', 0.5),
+      outline: getShadowStyles('#38bdf8', 0.3),
     };
 
     return {
@@ -75,6 +75,8 @@ export default function Button({
   return (
     <TouchableOpacity
       onPress={onPress}
+      onPressIn={() => setIsPressed(true)}
+      onPressOut={() => setIsPressed(false)}
       disabled={disabled}
       style={styles.container}
       activeOpacity={0.7}

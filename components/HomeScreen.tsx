@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Session } from '@supabase/supabase-js'
 import {
   View,
@@ -10,10 +10,11 @@ import {
   StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import tw from 'twrnc';
 import Button from './Button';
 import { useRouter } from 'expo-router';
 import Account from './Account';
+import { supabase } from '../lib/supabase';
+import ProfileSetupModal from './ProfileSetupModal';
 
 interface Folder {
   id: string;
@@ -21,11 +22,39 @@ interface Folder {
   createdAt: Date;
 }
 
-export default function MainScreen({ session }: { session: Session }) {
+interface HomeScreenProps {
+  session: Session;
+}
+
+export default function HomeScreen({ session }: HomeScreenProps) {
   const [showAccount, setShowAccount] = useState(false);
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [folders, setFolders] = useState<Folder[]>([]);
+  const [showProfileSetup, setShowProfileSetup] = useState(false);
+
+  useEffect(() => {
+    checkUsername();
+  }, [session]);
+
+  const checkUsername = async () => {
+    if (!session?.user?.id) return;
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', session.user.id)
+      .single();
+
+    if (error) {
+      console.error('Error checking username:', error);
+      return;
+    }
+
+    if (!data?.username) {
+      setShowProfileSetup(true);
+    }
+  };
 
   if (showAccount) {
     return <Account session={session} onBack={() => setShowAccount(false)} />;
@@ -53,13 +82,13 @@ export default function MainScreen({ session }: { session: Session }) {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100">
+    <SafeAreaView className="flex-1 bg-[#141F23]">
       <StatusBar barStyle="dark-content" />
       
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-2 border-b border-gray-200">
         <View className="flex-1 mr-4 max-w-md">
-          <View className="flex-row items-center bg-white rounded-lg px-4 py-2">
+          <View className="flex-row items-center bg-white rounded-lg px-4 h-12">
             <Ionicons name="search" size={20} color="#9CA3AF" />
             <TextInput
               className="flex-1 ml-2 text-base text-gray-900"
@@ -67,6 +96,7 @@ export default function MainScreen({ session }: { session: Session }) {
               value={searchQuery}
               onChangeText={handleSearch}
               placeholderTextColor="#9CA3AF"
+              style={{ height: '100%', paddingVertical: 0 }}
             />
           </View>
         </View>
@@ -109,7 +139,7 @@ export default function MainScreen({ session }: { session: Session }) {
       </View>
 
       {/* Create Folder Button - Fixed at bottom */}
-      <View className="absolute bottom-8 left-0 right-0 p-4 items-center bg-gray-100 z-10">
+      <View className="absolute bottom-8 left-0 right-0 p-4 items-center bg-[#141F23] z-10">
         <View className="w-40">
           <Button
             label="CREATE A FOLDER"
@@ -118,6 +148,12 @@ export default function MainScreen({ session }: { session: Session }) {
           />
         </View>
       </View>
+
+      <ProfileSetupModal
+        visible={showProfileSetup}
+        onClose={() => setShowProfileSetup(false)}
+        userId={session?.user?.id || ''}
+      />
     </SafeAreaView>
   );
 } 

@@ -3,14 +3,12 @@ import { supabase } from '../lib/supabase'
 import { View, Alert, SafeAreaView, TouchableOpacity, Text, TextInput } from 'react-native'
 import { Session } from '@supabase/supabase-js'
 import { Ionicons } from '@expo/vector-icons'
-import tw from 'twrnc'
 import Button from './Button'
 
 export default function Account({ session, onBack }: { session: Session; onBack: () => void }) {
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState('')
-  const [website, setWebsite] = useState('')
-  const [avatarUrl, setAvatarUrl] = useState('')
+
 
   useEffect(() => {
     if (session) getProfile()
@@ -23,7 +21,7 @@ export default function Account({ session, onBack }: { session: Session; onBack:
 
       const { data, error, status } = await supabase
         .from('profiles')
-        .select(`username, website, avatar_url`)
+        .select(`username`)
         .eq('id', session?.user.id)
         .single()
       if (error && status !== 406) {
@@ -32,8 +30,6 @@ export default function Account({ session, onBack }: { session: Session; onBack:
 
       if (data) {
         setUsername(data.username)
-        setWebsite(data.website)
-        setAvatarUrl(data.avatar_url)
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -45,13 +41,9 @@ export default function Account({ session, onBack }: { session: Session; onBack:
   }
 
   async function updateProfile({
-    username,
-    website,
-    avatar_url,
+    username
   }: {
     username: string
-    website: string
-    avatar_url: string
   }) {
     try {
       setLoading(true)
@@ -60,8 +52,6 @@ export default function Account({ session, onBack }: { session: Session; onBack:
       const updates = {
         id: session?.user.id,
         username,
-        website,
-        avatar_url,
         updated_at: new Date(),
       }
 
@@ -80,7 +70,7 @@ export default function Account({ session, onBack }: { session: Session; onBack:
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100">
+    <SafeAreaView className="flex-1 bg-[#141F23]">
       <View className="flex-row items-center p-4 border-b border-gray-200">
         <TouchableOpacity onPress={onBack} className="p-2">
           <Ionicons name="arrow-back" size={24} color="#374151" />
@@ -106,22 +96,13 @@ export default function Account({ session, onBack }: { session: Session; onBack:
               placeholderTextColor="#9CA3AF"
             />
           </View>
-          <View className="mt-4">
-            <Text className="text-gray-600 text-sm font-medium mb-1">Website</Text>
-            <TextInput
-              value={website || ''}
-              onChangeText={setWebsite}
-              className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-gray-900"
-              placeholder="Enter website"
-              placeholderTextColor="#9CA3AF"
-            />
-          </View>
+        
 
           <View className="mt-8 flex items-center">
             <View className="w-40">
               <Button
                 label={loading ? 'Loading ...' : 'Update Profile'}
-                onPress={() => updateProfile({ username, website, avatar_url: avatarUrl })}
+                onPress={() => updateProfile({ username})}
                 disabled={loading}
                 variant="primary"
               />
