@@ -86,7 +86,7 @@ export default function MainScreen({ session }: { session: Session }) {
           <FlatList
             data={folders}
             keyExtractor={(item) => item.id}
-            contentContainerClassName="w-full pt-4"
+            contentContainerClassName="w-full pt-4 pb-24"
             ListEmptyComponent={renderEmptyState}
             renderItem={({ item }) => (
               <TouchableOpacity
@@ -105,17 +105,17 @@ export default function MainScreen({ session }: { session: Session }) {
               </TouchableOpacity>
             )}
           />
+        </View>
+      </View>
 
-          {/* Create Folder Button */}
-          <View className="py-4 items-center">
-            <View className="w-40">
-              <Button
-                label="CREATE A FOLDER"
-                onPress={handleCreateFolder}
-                variant="primary"
-              />
-            </View>
-          </View>
+      {/* Create Folder Button - Fixed at bottom */}
+      <View className="absolute bottom-0 left-0 right-0 p-4 items-center bg-gray-100 z-10">
+        <View className="w-40">
+          <Button
+            label="CREATE A FOLDER"
+            onPress={handleCreateFolder}
+            variant="primary"
+          />
         </View>
       </View>
     </SafeAreaView>
