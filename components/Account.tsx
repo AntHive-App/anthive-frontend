@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { StyleSheet, View, Alert } from 'react-native'
-import { Button, Input } from '@rneui/themed'
+import { View, Alert, SafeAreaView, TouchableOpacity, Text, TextInput } from 'react-native'
 import { Session } from '@supabase/supabase-js'
+import { Ionicons } from '@expo/vector-icons'
+import tw from 'twrnc'
+import Button from './Button'
 
-export default function Account({ session }: { session: Session }) {
+export default function Account({ session, onBack }: { session: Session; onBack: () => void }) {
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState('')
   const [website, setWebsite] = useState('')
@@ -78,43 +80,66 @@ export default function Account({ session }: { session: Session }) {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Input label="Email" value={session?.user?.email} disabled />
+    <SafeAreaView className="flex-1 bg-gray-100">
+      <View className="flex-row items-center p-4 border-b border-gray-200">
+        <TouchableOpacity onPress={onBack} className="p-2">
+          <Ionicons name="arrow-back" size={24} color="#374151" />
+        </TouchableOpacity>
       </View>
-      <View style={styles.verticallySpaced}>
-        <Input label="Username" value={username || ''} onChangeText={(text) => setUsername(text)} />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Input label="Website" value={website || ''} onChangeText={(text) => setWebsite(text)} />
-      </View>
+      <View className="flex-1 mt-3 px-4 items-center">
+        <View className="w-full max-w-md">
+          <View className="mt-5">
+            <Text className="text-gray-600 text-sm font-medium mb-1">Email</Text>
+            <TextInput
+              value={session?.user?.email || ''}
+              editable={false}
+              className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-gray-900"
+            />
+          </View>
+          <View className="mt-4">
+            <Text className="text-gray-600 text-sm font-medium mb-1">Username</Text>
+            <TextInput
+              value={username || ''}
+              onChangeText={setUsername}
+              className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-gray-900"
+              placeholder="Enter username"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+          <View className="mt-4">
+            <Text className="text-gray-600 text-sm font-medium mb-1">Website</Text>
+            <TextInput
+              value={website || ''}
+              onChangeText={setWebsite}
+              className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-gray-900"
+              placeholder="Enter website"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
 
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button
-          title={loading ? 'Loading ...' : 'Update'}
-          onPress={() => updateProfile({ username, website, avatar_url: avatarUrl })}
-          disabled={loading}
-        />
-      </View>
+          <View className="mt-8 flex items-center">
+            <View className="w-40">
+              <Button
+                label={loading ? 'Loading ...' : 'Update Profile'}
+                onPress={() => updateProfile({ username, website, avatar_url: avatarUrl })}
+                disabled={loading}
+                variant="primary"
+              />
+            </View>
+          </View>
 
-      <View style={styles.verticallySpaced}>
-        <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
+          <View className="mt-4 flex items-center">
+            <View className="w-40">
+              <Button
+                label="Sign Out"
+                onPress={() => supabase.auth.signOut()}
+                variant="outline"
+              />
+            </View>
+          </View>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 40,
-    padding: 12,
-  },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
-  },
-  mt20: {
-    marginTop: 20,
-  },
-})

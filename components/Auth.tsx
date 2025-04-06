@@ -3,13 +3,13 @@ import {
   Alert,
   Text,
   TextInput,
-  TouchableOpacity,
   SafeAreaView,
   ScrollView,
   StatusBar,
   View,
 } from 'react-native';
 import { supabase } from '../lib/supabase';
+import Button from './Button';
 
 export default function EmailForm() {
   const [email, setEmail] = useState('');
@@ -34,50 +34,64 @@ export default function EmailForm() {
   };
 
   return (
-    <View className="flex-1 bg-[#14001D]">
-      <StatusBar barStyle="light-content" backgroundColor="#14001D" />
+    <View className="flex-1 bg-gray-100">
+      <StatusBar barStyle="dark-content" />
       <SafeAreaView className="flex-1">
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-5 pt-20">
-          <Text className="text-white text-3xl font-bold">Welcome to AntHive</Text>
-          <Text className="text-gray-400 mt-1 mb-8">Create notes and collaborate with friends</Text>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-4 pt-20">
+          <View className="flex-1 items-center">
+            <View className="w-full max-w-md">
+              <Text className="text-gray-900 text-3xl font-bold">Welcome to AntHive</Text>
+              <Text className="text-gray-500 mt-1 mb-8">Create notes and collaborate with friends</Text>
 
-          <Text className="text-white text-xs font-bold mt-2 mb-1">EMAIL ADDRESS</Text>
-          <TextInput
-            className="bg-white rounded-lg px-4 py-3 text-base"
-            placeholder="email@address.com"
-            placeholderTextColor="#999"
-            autoCapitalize="none"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
-          />
+              <View className="mt-5">
+                <Text className="text-gray-600 text-xs font-bold mb-1">EMAIL ADDRESS</Text>
+                <TextInput
+                  className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-base text-gray-900"
+                  placeholder="email@address.com"
+                  placeholderTextColor="#9CA3AF"
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  value={email}
+                  onChangeText={setEmail}
+                />
+              </View>
 
-          <Text className="text-white text-xs font-bold mt-6 mb-1">PASSWORD</Text>
-          <TextInput
-            className="bg-white rounded-lg px-4 py-3 text-base"
-            placeholder="********"
-            placeholderTextColor="#999"
-            secureTextEntry
-            autoCapitalize="none"
-            value={password}
-            onChangeText={setPassword}
-          />
+              <View className="mt-4">
+                <Text className="text-gray-600 text-xs font-bold mb-1">PASSWORD</Text>
+                <TextInput
+                  className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-base text-gray-900"
+                  placeholder="********"
+                  placeholderTextColor="#9CA3AF"
+                  secureTextEntry
+                  autoCapitalize="none"
+                  value={password}
+                  onChangeText={setPassword}
+                />
+              </View>
 
-          <TouchableOpacity
-            onPress={() => handleAuth('signIn')}
-            disabled={loading}
-            className="bg-gray-200 py-3.5 rounded-xl mt-8 shadow-[0_8px_0_rgb(180,180,180,0.5)]"
-          >
-            <Text className="text-center font-bold text-black">SIGN IN</Text>
-          </TouchableOpacity>
+              <View className="mt-8 items-center">
+                <View className="w-40">
+                  <Button
+                    label="SIGN IN"
+                    onPress={() => handleAuth('signIn')}
+                    disabled={loading}
+                    variant="primary"
+                  />
+                </View>
+              </View>
 
-          <TouchableOpacity
-            onPress={() => handleAuth('signUp')}
-            disabled={loading}
-            className="bg-gray-200 py-3.5 rounded-xl mt-4 mb-10 shadow-[0_8px_0_rgb(180,180,180,0.5)]"
-          >
-            <Text className="text-center font-bold text-black">SIGN UP</Text>
-          </TouchableOpacity>
+              <View className="mt-4 items-center">
+                <View className="w-40">
+                  <Button
+                    label="SIGN UP"
+                    onPress={() => handleAuth('signUp')}
+                    disabled={loading}
+                    variant="outline"
+                  />
+                </View>
+              </View>
+            </View>
+          </View>
         </ScrollView>
       </SafeAreaView>
     </View>
