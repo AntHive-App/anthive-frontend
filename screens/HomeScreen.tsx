@@ -162,8 +162,9 @@ export default function HomeScreen({ session }: HomeScreenProps) {
             ListEmptyComponent={renderEmptyState}
             renderItem={({ item }) => (
               <TouchableOpacity
-                className=" border border-gray-300 rounded-xl p-4 mb-3"
+                className="border border-gray-300 rounded-xl p-4 mb-3"
                 style={{
+                  backgroundColor: '#1F2937',
                   shadowColor: '#D1D5DB',
                   shadowOffset: {
                     width: 0,

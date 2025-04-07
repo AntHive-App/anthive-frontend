@@ -40,15 +40,15 @@ export default function DeleteFolderModal({ visible, onClose, folderId, onDelete
             Are you sure you want to delete this folder? This action cannot be undone.
           </Text>
 
-          <View className="flex-row justify-end space-x-2">
-            <View className="w-32">
+          <View className="flex-row justify-end space-x-4">
+            <View className="w-28">
               <Button
                 variant="outline"
                 label="Cancel"
                 onPress={onClose}
               />
             </View>
-            <View className="w-32">
+            <View className="w-28">
               <Button
                 label="Delete"
                 onPress={handleDelete}

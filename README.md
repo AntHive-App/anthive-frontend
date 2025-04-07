@@ -1,50 +1,130 @@
-# Welcome to your Expo app 👋
+# Anthive
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native mobile application for managing folders and content on iOS and Android.
 
-## Get started
+## Features
 
-1. Install dependencies
+- User Authentication
+  - Sign in with email/password
+  - Profile setup with username, first name, and last name
+  - Secure session management
 
+- Folder Management
+  - Create new folders with names and descriptions
+  - View list of created folders
+  - Delete folders with confirmation
+  - Real-time folder name availability check
+
+- User Interface
+  - Modern, clean design
+  - Responsive layout for mobile devices
+  - Intuitive navigation
+  - Loading states and error handling
+
+## Tech Stack
+
+- React Native
+- Expo Router for navigation
+- Supabase for backend services
+  - Authentication
+  - Database
+  - Row Level Security (RLS)
+- Tailwind CSS for styling
+- TypeScript for type safety
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── Account.tsx
+|   ├── Auth.tsx
+│   ├── Button.tsx
+│   ├── CreateFolderModal.tsx
+│   ├── DeleteFolderModal.tsx
+│   ├── ProfileSetupModal.tsx
+|   ├── SignUp.tsx
+│   └── SignIn.tsx
+|   
+├── lib/
+│   └── supabase.ts
+├── screens/
+│   └── HomeScreen.tsx
+
+```
+
+## Getting Started
+
+1. Clone the repository
+2. Install dependencies:
    ```bash
    npm install
    ```
-
-2. Start the app
-
+3. Set up environment variables:
+   Create a `.env` file with your Supabase credentials:
+   ```
+   EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+   EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+4. Start the development server:
    ```bash
-    npx expo start
+   npx expo start
+   ```
+5. Run on your preferred platform:
+   ```bash
+   # Press 'i' for iOS simulator
+   # Press 'a' for Android emulator
+   # Or scan QR code with Expo Go app
    ```
 
-In the output, you'll find options to open the app in a
+## Database Schema
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Folders Table
+```sql
+create table folders (
+  id uuid default uuid_generate_v4() primary key,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  name text not null,
+  description text,
+  user_id uuid references auth.users not null
+);
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+-- Enable Row Level Security
+alter table folders enable row level security;
 
-## Get a fresh project
+-- Create policies
+create policy "Users can insert their own folders"
+  on folders for insert
+  with check (auth.uid() = user_id);
 
-When you're ready, run:
+create policy "Users can select their own folders"
+  on folders for select
+  using (auth.uid() = user_id);
 
-```bash
-npm run reset-project
+create policy "Users can delete their own folders"
+  on folders for delete
+  using (auth.uid() = user_id);
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Components
 
-## Learn more
+### Button
+A reusable button component with multiple variants:
+- Primary (default)
+- Secondary
+- Outline
+- Danger (for delete actions)
 
-To learn more about developing your project with Expo, look at the following resources:
+### Modals
+- ProfileSetupModal: For setting up user profile after sign-in
+- CreateFolderModal: For creating new folders
+- DeleteFolderModal: For confirming folder deletion
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Screens
+- HomeScreen: Main screen displaying user's folders
+- SignIn: Authentication screen
 
-## Join the community
 
-Join our community of developers creating universal apps.
+## License
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+This project is licensed under the MIT License - see the LICENSE file for details.

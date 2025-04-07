@@ -85,7 +85,7 @@ export default function CreateFolderModal({ visible, onClose, userId }: CreateFo
       onRequestClose={onClose}
     >
       <View className="flex-1 justify-center items-center bg-black/50">
-        <View className="bg-white rounded-lg p-6 w-11/12 max-w-md">
+        <View className="bg-white rounded-lg p-4 w-11/12 max-w-sm -mt-20">
           <Text className="text-2xl font-bold text-gray-900 mb-2">Create New Folder</Text>
           <Text className="text-gray-600 mb-4">
             Enter the details for your new folder
@@ -123,8 +123,8 @@ export default function CreateFolderModal({ visible, onClose, userId }: CreateFo
             <Text className="text-red-500 text-xs mb-4">{error}</Text>
           ) : null}
 
-          <View className="flex-row justify-end space-x-2">
-            <View className="w-32">
+          <View className="flex-row justify-end space-x-4">
+            <View className="w-28">
               <Button
                 variant="outline"
                 label="Cancel"
@@ -132,7 +132,7 @@ export default function CreateFolderModal({ visible, onClose, userId }: CreateFo
                 disabled={loading}
               />
             </View>
-            <View className="w-32">
+            <View className="w-28">
               <Button
                 label={loading ? 'Creating...' : 'Create'}
                 onPress={handleCreateFolder}

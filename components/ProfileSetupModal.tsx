@@ -23,6 +23,7 @@ export default function ProfileSetupModal({ visible, onClose, userId }: ProfileS
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
   const [usernameError, setUsernameError] = useState('');
+  const [error, setError] = useState('');
 
   const checkUsernameAvailability = async (username: string) => {
     const { data, error } = await supabase
@@ -78,7 +79,7 @@ export default function ProfileSetupModal({ visible, onClose, userId }: ProfileS
 
   const handleUsernameChange = async (text: string) => {
     setUsername(text);
-    
+    setError('');
   };
 
   return (
@@ -89,17 +90,19 @@ export default function ProfileSetupModal({ visible, onClose, userId }: ProfileS
       onRequestClose={onClose}
     >
       <View className="flex-1 justify-center items-center bg-black/50">
-        <View className="bg-white rounded-lg p-6 w-11/12 max-w-md">
-          <Text className="text-2xl font-bold text-gray-900 mb-2">Complete Your Profile</Text>
+        <View className="bg-white rounded-lg p-4 w-11/12 max-w-sm -mt-20">
+          <Text className="text-xl font-bold text-gray-900 mb-2">Complete Your Profile</Text>
           <Text className="text-gray-600 mb-4">
             Add your details to get started
           </Text>
+
+          
 
           <View className="mb-4">
             <Text className="text-gray-600 text-xs font-bold mb-1">FIRST NAME</Text>
             <TextInput
               className="bg-gray-100 border border-gray-300 rounded-lg px-4 py-2 text-base text-gray-900"
-              placeholder="First name"
+              placeholder="Enter your first name"
               placeholderTextColor="#9CA3AF"
               value={firstName}
               onChangeText={setFirstName}
@@ -110,7 +113,7 @@ export default function ProfileSetupModal({ visible, onClose, userId }: ProfileS
             <Text className="text-gray-600 text-xs font-bold mb-1">LAST NAME</Text>
             <TextInput
               className="bg-gray-100 border border-gray-300 rounded-lg px-4 py-2 text-base text-gray-900"
-              placeholder="Last name"
+              placeholder="Enter your last name"
               placeholderTextColor="#9CA3AF"
               value={lastName}
               onChangeText={setLastName}
@@ -133,11 +136,18 @@ export default function ProfileSetupModal({ visible, onClose, userId }: ProfileS
           </View>
 
           <View className="flex-row justify-end space-x-2">
-            <View className="w-32">
+            <View className="w-28">
+              <Button
+                variant="outline"
+                label="Cancel"
+                onPress={onClose}
+                disabled={loading}
+              />
+            </View>
+            <View className="w-28">
               <Button
                 label={loading ? 'Creating...' : 'Create'}
                 onPress={handleCreateProfile}
-                variant="primary"
                 disabled={loading || !!usernameError}
               />
             </View>
