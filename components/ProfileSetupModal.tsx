@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Modal,
   View,
   Text,
   TextInput,
   Alert,
-  ActivityIndicator,
 } from 'react-native';
 import { supabase } from '../lib/supabase';
 import Button from './Button';
-import { useDebounce } from '../hooks/useDebounce';
 
 interface ProfileSetupModalProps {
   visible: boolean;
@@ -17,46 +15,29 @@ interface ProfileSetupModalProps {
   userId: string;
 }
 
+// TODO: error handling for username length and special characters use set error to indicate errors
+
 export default function ProfileSetupModal({ visible, onClose, userId }: ProfileSetupModalProps) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
   const [usernameError, setUsernameError] = useState('');
-  const [checkingUsername, setCheckingUsername] = useState(false);
 
-  const debouncedUsername = useDebounce(username, 1000);
+  const checkUsernameAvailability = async (username: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('username', username.trim())
+      .single();
 
-  useEffect(() => {
-    const checkUsernameAvailability = async () => {
-      if (!debouncedUsername.trim()) {
-        setUsernameError('');
-        return;
-      }
+    if (error && error.code !== 'PGRST116') { // PGRST116 is the "not found" error
+      console.error('Error checking username:', error);
+      return false;
+    }
 
-      setCheckingUsername(true);
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('username')
-          .eq('username', debouncedUsername.trim())
-          .single();
-
-        if (error && error.code !== 'PGRST116') {
-          console.error('Error checking username:', error);
-          return;
-        }
-
-        setUsernameError(data ? 'Username already exists' : '');
-      } catch (error) {
-        console.error('Error checking username:', error);
-      } finally {
-        setCheckingUsername(false);
-      }
-    };
-
-    checkUsernameAvailability();
-  }, [debouncedUsername]);
+    return !data; // If data exists, username is taken
+  };
 
   const handleCreateProfile = async () => {
     if (!firstName.trim() || !lastName.trim() || !username.trim()) {
@@ -66,6 +47,14 @@ export default function ProfileSetupModal({ visible, onClose, userId }: ProfileS
 
     setLoading(true);
     try {
+      // Check username availability
+      const isAvailable = await checkUsernameAvailability(username);
+      if (!isAvailable) {
+        setUsernameError('Username already exists');
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase
         .from('profiles')
         .upsert({
@@ -87,8 +76,9 @@ export default function ProfileSetupModal({ visible, onClose, userId }: ProfileS
     }
   };
 
-  const handleUsernameChange = (text: string) => {
+  const handleUsernameChange = async (text: string) => {
     setUsername(text);
+    
   };
 
   return (
@@ -129,19 +119,14 @@ export default function ProfileSetupModal({ visible, onClose, userId }: ProfileS
 
           <View className="mb-4">
             <Text className="text-gray-600 text-xs font-bold mb-1">USERNAME</Text>
-            <View className="relative">
-              <TextInput
-                className="bg-gray-100 border border-gray-300 rounded-lg px-4 py-2 text-base text-gray-900"
-                placeholder="Choose a username"
-                placeholderTextColor="#9CA3AF"
-                autoCapitalize="none"
-                value={username}
-                onChangeText={handleUsernameChange}
-              />
-              {checkingUsername && (
-                <ActivityIndicator className="absolute right-3 top-3" />
-              )}
-            </View>
+            <TextInput
+              className="bg-gray-100 border border-gray-300 rounded-lg px-4 py-2 text-base text-gray-900"
+              placeholder="Choose a username"
+              placeholderTextColor="#9CA3AF"
+              autoCapitalize="none"
+              value={username}
+              onChangeText={handleUsernameChange}
+            />
             {usernameError ? (
               <Text className="text-red-500 text-xs mt-1">{usernameError}</Text>
             ) : null}

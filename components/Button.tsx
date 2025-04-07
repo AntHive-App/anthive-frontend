@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { TouchableOpacity, Text, Platform } from 'react-native';
 import tw from 'twrnc';
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline';
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger';
 
 interface ButtonProps {
   onPress: () => void;
@@ -27,13 +27,15 @@ export default function Button({
     const variantStyles = {
       primary: tw`bg-sky-400`,
       secondary: tw`bg-gray-200`,
-      outline: tw`bg-white border-2 border-sky-400`
+      outline: tw`bg-white border-2 border-sky-400`,
+      danger: tw`bg-red-500`
     };
 
     const textStyles = {
       primary: tw`text-white font-bold text-center`,
       secondary: tw`text-black font-bold text-center`,
-      outline: tw`text-sky-400 font-bold text-center`
+      outline: tw`text-sky-400 font-bold text-center`,
+      danger: tw`text-white font-bold text-center`
     };
 
     const getShadowStyles = (color: string, opacity: number) => {
@@ -57,6 +59,7 @@ export default function Button({
       primary: getShadowStyles('#38bdf8', 0.5),
       secondary: getShadowStyles('#b4b4b4', 0.5),
       outline: getShadowStyles('#38bdf8', 0.3),
+      danger: getShadowStyles('#ef4444', 0.5)
     };
 
     return {

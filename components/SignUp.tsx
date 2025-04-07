@@ -12,7 +12,7 @@ import Button from './Button';
 interface SignUpProps {
   onSwitchToSignIn: () => void;
 }
-
+// TODO: error handling for username length and special characters use set error to indicate errors
 export default function SignUp({ onSwitchToSignIn }: SignUpProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

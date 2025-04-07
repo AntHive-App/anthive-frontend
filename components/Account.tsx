@@ -4,7 +4,7 @@ import { View, Alert, SafeAreaView, TouchableOpacity, Text, TextInput } from 're
 import { Session } from '@supabase/supabase-js'
 import { Ionicons } from '@expo/vector-icons'
 import Button from './Button'
-
+// TODO: error handling for username length and special characters use set error to indicate errors
 export default function Account({ session, onBack }: { session: Session; onBack: () => void }) {
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState('')
