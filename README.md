@@ -1,7 +1,5 @@
 # Anthive
 
-A React Native mobile application for managing folders and content on iOS and Android.
-
 ## Features
 
 - User Authentication
