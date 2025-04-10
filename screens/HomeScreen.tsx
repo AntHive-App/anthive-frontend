@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Session } from '@supabase/supabase-js'
+import React, { useState, useEffect } from "react";
+import { Session } from "@supabase/supabase-js";
 import {
   View,
   TextInput,
@@ -8,6 +8,8 @@ import {
   Text,
   SafeAreaView,
   StatusBar,
+  StyleSheet,
+  Platform,
 } 
 from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -30,6 +32,55 @@ interface HomeScreenProps {
   session: Session;
 }
 // TODO: error handling for username length and special characters use set error to indicate errors
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#374151',
+    position: 'relative',
+  },
+  searchContainer: {
+    ...Platform.select({
+      web: {
+        width: '20%',
+      },
+      default: {
+        flex: 1,
+        maxWidth: '80%',
+      }
+    }),
+  },
+  searchInput: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    height: 48,
+  },
+  settingsButton: {
+    position: 'absolute',
+    right: 16,
+  },
+  folderListContainer: {
+    ...Platform.select({
+      web: {
+        width: '60%',
+        alignSelf: 'center',
+        marginTop: 16,
+      },
+      default: {
+        width: '95%',
+        marginTop: 16,
+      }
+    }),
+  },
+});
+
 export default function HomeScreen({ session }: HomeScreenProps) {
   const [showAccount, setShowAccount] = useState(false);
   const router = useRouter();
@@ -52,13 +103,13 @@ export default function HomeScreen({ session }: HomeScreenProps) {
   const getProfile = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('username')
-        .eq('id', session.user.id)
-        .single();
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', session.user.id)
+      .single();
 
-      if (error) {
+    if (error) {
         throw error;
       }
 
@@ -93,10 +144,7 @@ export default function HomeScreen({ session }: HomeScreenProps) {
     return <Account session={session} onBack={() => setShowAccount(false)} />;
   }
 
-  const handleCreateFolder = () => {
-    // TODO: Implement folder creation logic
-    console.log('Create folder');
-  };
+
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -126,46 +174,46 @@ export default function HomeScreen({ session }: HomeScreenProps) {
   return (
     <SafeAreaView className="flex-1 bg-[#141F23]">
       <StatusBar barStyle="dark-content" />
-      
+
       {/* Header */}
-      <View className="flex-row items-center justify-between px-4 py-2 border-b border-gray-200">
-        <View className="flex-1 mr-4 max-w-md">
-          <View className="flex-row items-center bg-white rounded-lg px-4 h-12">
+      <View style={styles.header}>
+        <View style={styles.searchContainer}>
+          <View style={styles.searchInput}>
             <Ionicons name="search" size={20} color="#9CA3AF" />
             <TextInput
-              className="flex-1 ml-2 text-base text-gray-900"
+              className="flex-1 ml-2 text-lg text-gray-900"
               placeholder="Search folders..."
               value={searchQuery}
               onChangeText={handleSearch}
               placeholderTextColor="#9CA3AF"
-              style={{ height: '100%', paddingVertical: 0 }}
+              style={{ height: 40, paddingVertical: 0 }}
             />
           </View>
         </View>
         
         <TouchableOpacity
           onPress={() => setShowAccount(true)}
-          className="p-2"
+          style={styles.settingsButton}
         >
-          <Ionicons name="settings-outline" size={24} color="#374151" />
+          <Ionicons name="settings-outline" size={24} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
 
       {/* Content Container */}
       <View className="flex-1 items-center px-4">
-        <View className="w-full max-w-2xl">
+        <View style={styles.folderListContainer}>
           {/* Folder List */}
           <FlatList
             data={folders}
             keyExtractor={(item) => item.id}
-            contentContainerClassName="w-full pt-4 pb-24"
+            contentContainerClassName="w-full pb-24"
             ListEmptyComponent={renderEmptyState}
             renderItem={({ item }) => (
               <TouchableOpacity
                 className="border border-gray-300 rounded-xl p-4 mb-3"
                 style={{
-                  backgroundColor: '#1F2937',
-                  shadowColor: '#D1D5DB',
+                  backgroundColor: "#1F2937",
+                  shadowColor: "#D1D5DB",
                   shadowOffset: {
                     width: 0,
                     height: 5,
@@ -232,9 +280,9 @@ export default function HomeScreen({ session }: HomeScreenProps) {
       <DeleteFolderModal
         visible={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
-        folderId={selectedFolderId || ''}
+        folderId={selectedFolderId || ""}
         onDelete={onFolderDeleted}
       />
     </SafeAreaView>
   );
-} 
+}

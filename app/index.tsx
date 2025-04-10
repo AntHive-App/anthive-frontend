@@ -20,7 +20,7 @@ export default function App() {
   }, [])
 
   return (
-    <View className="min-h-screen bg-[#141F23]">
+    <View className="min-h-screen bg-[#1F2937]">
       {session && session.user ? <HomeScreen key={session.user.id} session={session} /> : <Auth />}
     </View>
   )

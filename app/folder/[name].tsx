@@ -1,67 +1,136 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, TextInput, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '@/lib/supabase';
+import AddContentModal from '@/components/AddContentModal';
 
-interface Folder {
+interface Note {
   id: string;
-  name: string;
-  description: string | null;
+  content: string;
   created_at: string;
+  type: 'text' | 'audio' | 'pdf' | 'youtube';
 }
 
-export default function FolderPage() {
+export default function FolderScreen() {
   const { name } = useLocalSearchParams();
-  const [folder, setFolder] = useState<Folder | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
-    const fetchFolder = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('folders')
-          .select('*')
-          .eq('name', name)
-          .single();
-
-        if (error) throw error;
-        setFolder(data);
-      } catch (error) {
-        console.error('Error fetching folder:', error);
-        setError('Failed to load folder');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFolder();
+    fetchNotes();
   }, [name]);
 
-  if (loading) {
-    return (
-      <View className="flex-1 justify-center items-center bg-[#141F23]">
-        <ActivityIndicator size="large" color="#ffffff" />
-      </View>
-    );
-  }
+  const fetchNotes = async () => {
+    try {
+    //   const { data, error } = await supabase
+    //     .from('notes')
+    //     .select('*')
+    //     .eq('folder_name', name)
+    //     .order('created_at', { ascending: false });
 
-  if (error || !folder) {
-    return (
-      <View className="flex-1 justify-center items-center bg-[#141F23]">
-        <Text className="text-white text-lg">{error || 'Folder not found'}</Text>
-      </View>
-    );
-  }
+    //   if (error) throw error;
+    //   setNotes(data || []);
+    } catch (error) {
+      console.error('Error fetching notes:', error);
+    }
+  };
+
+  const handleSend = async () => {
+    if (!input.trim()) return;
+
+    try {
+      setLoading(true);
+    //   const { error } = await supabase
+    //     .from('notes')
+    //     .insert([
+    //       {
+    //         content: input.trim(),
+    //         folder_name: name,
+    //         type: 'text'
+    //       }
+    //     ]);
+
+    //   if (error) throw error;
+    //   setInput('');
+    //   fetchNotes();
+    } catch (error) {
+      console.error('Error sending note:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSelectType = (type: 'text' | 'audio' | 'youtube' | 'file') => {
+    setShowAddModal(false);
+    // TODO: Implement handlers for different content types
+    if (type === 'text') {
+      // Text input is already available
+    } else if (type === 'audio') {
+      // Implement audio recording
+    } else if (type === 'file') {
+      // Implement file upload
+    } else if (type === 'youtube') {
+      // Implement YouTube link
+    }
+  };
+
+  const renderNote = ({ item }: { item: Note }) => (
+    <View className="bg-gray-800 border border-gray-300 rounded-xl p-4 mb-3">
+      <Text className="text-white">{item.content}</Text>
+      <Text className="text-gray-300 text-xs mt-2">
+        {new Date(item.created_at).toLocaleString()}
+      </Text>
+    </View>
+  );
 
   return (
-    <View className="flex-1 bg-[#141F23] p-4">
-      <View className="mb-4">
-        <Text className="text-white text-2xl font-bold">{folder.name}</Text>
-        {folder.description && (
-          <Text className="text-gray-400 mt-2">{folder.description}</Text>
-        )}
+    <View className="flex-1 bg-gray-900">
+      <View className="flex-1">
+        <FlatList
+          data={notes}
+          renderItem={renderNote}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ padding: 16 }}
+          inverted
+        />
       </View>
+
+      <View className="p-4 border-t border-gray-700">
+        <View className="flex-row items-center space-x-2">
+          <TouchableOpacity
+            onPress={() => setShowAddModal(true)}
+            className="bg-gray-800 p-3 rounded-xl"
+          >
+            <Ionicons name="add" size={24} color="white" />
+          </TouchableOpacity>
+          
+          <TextInput
+            className="flex-1 bg-gray-800 text-white rounded-xl px-4 py-3"
+            placeholder="Type a message..."
+            placeholderTextColor="#9CA3AF"
+            value={input}
+            onChangeText={setInput}
+            multiline
+          />
+          
+          <TouchableOpacity
+            onPress={handleSend}
+            disabled={loading || !input.trim()}
+            className="bg-sky-500 p-3 rounded-xl"
+          >
+            <Ionicons name="send" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <AddContentModal
+        visible={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSelectType={handleSelectType}
+      />
     </View>
   );
 } 
