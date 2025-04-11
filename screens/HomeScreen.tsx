@@ -39,8 +39,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#374151',
     position: 'relative',
   },
   searchContainer: {
@@ -172,7 +170,7 @@ export default function HomeScreen({ session }: HomeScreenProps) {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-[#141F23]">
+    <SafeAreaView className="flex-1 bg-[#1F2937]">
       <StatusBar barStyle="dark-content" />
 
       {/* Header */}
@@ -210,9 +208,9 @@ export default function HomeScreen({ session }: HomeScreenProps) {
             ListEmptyComponent={renderEmptyState}
             renderItem={({ item }) => (
               <TouchableOpacity
-                className="border border-gray-300 rounded-xl p-4 mb-3"
+                className="rounded-xl p-4 mb-3"
                 style={{
-                  backgroundColor: "#1F2937",
+                  backgroundColor: "#374151",
                   shadowColor: "#D1D5DB",
                   shadowOffset: {
                     width: 0,
@@ -255,7 +253,7 @@ export default function HomeScreen({ session }: HomeScreenProps) {
       </View>
 
       {/* Create Folder Button - Fixed at bottom */}
-      <View className="absolute bottom-8 left-0 right-0 p-4 items-center bg-[#141F23] z-10">
+      <View className="absolute bottom-8 left-0 right-0 p-4 items-center bg-[#1F2937] z-10">
         <View className="w-40">
           <Button
             label="CREATE A FOLDER"

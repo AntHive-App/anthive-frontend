@@ -104,25 +104,32 @@ create policy "Users can delete their own folders"
   using (auth.uid() = user_id);
 ```
 
-## Components
+### Resources Table
+```sql
+create table resources (
+  id uuid default uuid_generate_v4() primary key,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  folder_name text not null,
+  type text not null check (type in ('text', 'pdf', 'link', 'audio')),
+  content text not null,
+  description text,
+  link_type text check (link_type in ('youtube', 'drive')),
+  user_id uuid references auth.users not null
+);
 
-### Button
-A reusable button component with multiple variants:
-- Primary (default)
-- Secondary
-- Outline
-- Danger (for delete actions)
+-- Enable Row Level Security
+alter table resources enable row level security;
 
-### Modals
-- ProfileSetupModal: For setting up user profile after sign-in
-- CreateFolderModal: For creating new folders
-- DeleteFolderModal: For confirming folder deletion
+-- Create policies
+create policy "Users can insert their own resources"
+  on resources for insert
+  with check (auth.uid() = user_id);
 
-### Screens
-- HomeScreen: Main screen displaying user's folders
-- SignIn: Authentication screen
+create policy "Users can select their own resources"
+  on resources for select
+  using (auth.uid() = user_id);
 
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+create policy "Users can delete their own resources"
+  on resources for delete
+  using (auth.uid() = user_id);
+```

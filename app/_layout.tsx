@@ -1,12 +1,12 @@
 import { Stack } from "expo-router";
-
+import Header from '@/components/Header';
 
 export default function RootLayout() {
   return (
     <Stack
       screenOptions={{
-        headerShown: false,
-        animation: 'slide_from_right',
+        header: () => <Header />,
+        contentStyle: { backgroundColor: '#1F2937' },
       }}
     >
     
