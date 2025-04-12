@@ -1,6 +1,6 @@
 import * as FileSystem from 'expo-file-system';
 
-const API_BASE_URL = 'http://192.168.1.100:8001';
+const API_BASE_URL = 'http://0.0.0.0:8001';
 
 export const api = {
   async extractText(fileUri: string, fileType: 'image' | 'pdf') {
