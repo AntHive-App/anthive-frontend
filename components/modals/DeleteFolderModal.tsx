@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, View, Text } from 'react-native';
-import Button from './Button';
-import { supabase } from '../lib/supabase';
+import Button from '@/components/Button';
+import { supabase } from '@/lib/supabase';
 
 interface DeleteFolderModalProps {
   visible: boolean;

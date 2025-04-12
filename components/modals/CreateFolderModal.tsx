@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, TextInput, Alert } from 'react-native';
-import { supabase } from '../lib/supabase';
-import Button from './Button';
+import { supabase } from '../../lib/supabase';
+import Button from '../Button';
 import { useRouter } from 'expo-router';
 
 interface CreateFolderModalProps {

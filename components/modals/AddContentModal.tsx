@@ -8,8 +8,8 @@ import {
   Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Button from './Button';
-import { supabase } from '../lib/supabase';
+import Button from '@/components/Button';
+import { supabase } from '@/lib/supabase';
 
 interface AddContentModalProps {
   visible: boolean;

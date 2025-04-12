@@ -3,9 +3,10 @@ import { View, Text, FlatList, TextInput, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
-import AddContentModal from '@/components/AddContentModal';
-import TextInputModal from '@/components/TextInputModal';
-import NoteSummaryModal from '@/components/NoteSummaryModal';
+import AddContentModal from '@/components/modals/AddContentModal';
+import TextInputModal from '@/components/modals/TextInputModal';
+import NoteSummaryModal from '@/components/modals/NoteSummaryModal';
+import FileUploadModal from '@/components/modals/FileUploadModal';
 
 interface Note {
   id: string;
@@ -25,6 +26,7 @@ export default function FolderScreen() {
   const [loading, setLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showTextModal, setShowTextModal] = useState(false);
+  const [showFileModal, setShowFileModal] = useState(false);
   const [userId, setUserId] = useState<string>('');
   const [folderId, setFolderId] = useState<string>('');
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
@@ -60,17 +62,12 @@ export default function FolderScreen() {
     }
   };
 
-
-
   const handleSelectType = (type: 'text' | 'audio' | 'youtube' | 'file') => {
     setShowAddModal(false);
-    // TODO: Implement handlers for different content types
     if (type === 'text') {
-      // Text input is already available
-    } else if (type === 'audio') {
-      // Implement audio recording
+      setShowTextModal(true);
     } else if (type === 'file') {
-      // Implement file upload
+      setShowFileModal(true);
     } else if (type === 'youtube') {
       // Implement YouTube link
     }
@@ -116,13 +113,13 @@ export default function FolderScreen() {
           <Ionicons name="document-text" size={32} color="#FFFFFF" />
           <Text className="text-white mt-2">Text</Text>
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           className="bg-[#374151] p-4 rounded-xl items-center w-40"
           onPress={() => handleSelectType('audio')}
         >
           <Ionicons name="musical-notes" size={32} color="#FFFFFF" />
           <Text className="text-white mt-2">Audio</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           className="bg-[#374151] p-4 rounded-xl items-center w-40"
           onPress={() => handleSelectType('youtube')}
@@ -199,6 +196,14 @@ export default function FolderScreen() {
         onSend={() => fetchNotes()}
         folderId={folderId}
         userId={userId}
+      />
+
+      <FileUploadModal
+        visible={showFileModal}
+        onClose={() => setShowFileModal(false)}
+        folderId={folderId}
+        userId={userId}
+        onUploadComplete={fetchNotes}
       />
 
       <NoteSummaryModal

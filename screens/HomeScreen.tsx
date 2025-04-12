@@ -17,9 +17,9 @@ import { Ionicons } from '@expo/vector-icons';
 import Button from '../components/Button';
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
-import ProfileSetupModal from '../components/ProfileSetupModal';
-import CreateFolderModal from '../components/CreateFolderModal';
-import DeleteFolderModal from '../components/DeleteFolderModal';
+import ProfileSetupModal from '@/components/modals/ProfileSetupModal';
+import CreateFolderModal from '@/components/modals/CreateFolderModal';
+import DeleteFolderModal from '@/components/modals/DeleteFolderModal';
 
 interface Folder {
   id: string;

@@ -6,8 +6,8 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
-import { supabase } from '../lib/supabase';
-import Button from './Button';
+import { supabase } from '@/lib/supabase';
+import Button from '@/components/Button';
 
 interface ProfileSetupModalProps {
   visible: boolean;
