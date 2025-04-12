@@ -1,6 +1,6 @@
 import * as FileSystem from 'expo-file-system';
 
-const API_BASE_URL = 'http://0.0.0.0:8001';
+const API_BASE_URL = 'http://localhost:8001';
 
 export const api = {
   async extractText(fileUri: string, fileType: 'image' | 'pdf') {
@@ -21,7 +21,8 @@ export const api = {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to extract text');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to extract text');
       }
 
       const data = await response.json();
@@ -49,7 +50,8 @@ export const api = {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to process note');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to process note');
       }
 
       return await response.json();
