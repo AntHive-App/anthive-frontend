@@ -3,9 +3,11 @@ import { supabase } from '../lib/supabase'
 import { View, Alert, SafeAreaView, TouchableOpacity, Text, TextInput } from 'react-native'
 import { Session } from '@supabase/supabase-js'
 import { Ionicons } from '@expo/vector-icons'
+import { useRouter } from 'expo-router'
 import Button from './Button'
 // TODO: error handling for username length and special characters use set error to indicate errors
-export default function Account({ session, onBack }: { session: Session; onBack: () => void }) {
+export default function Account({ session }: { session: Session; }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState('')
 
@@ -72,7 +74,7 @@ export default function Account({ session, onBack }: { session: Session; onBack:
   return (
     <SafeAreaView className="flex-1 bg-[#1F2937]">
       <View className="flex-row items-center p-4 border-b border-gray-200">
-        <TouchableOpacity onPress={onBack} className="p-2">
+        <TouchableOpacity onPress={() => router.back()} className="p-2">
           <Ionicons name="arrow-back" size={24} color="#374151" />
         </TouchableOpacity>
       </View>
@@ -96,13 +98,13 @@ export default function Account({ session, onBack }: { session: Session; onBack:
               placeholderTextColor="#9CA3AF"
             />
           </View>
-        
+
 
           <View className="mt-8 flex items-center">
             <View className="w-40">
               <Button
                 label={loading ? 'Loading ...' : 'Update Profile'}
-                onPress={() => updateProfile({ username})}
+                onPress={() => updateProfile({ username })}
                 disabled={loading}
                 variant="primary"
               />

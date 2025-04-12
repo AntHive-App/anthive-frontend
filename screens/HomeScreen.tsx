@@ -10,12 +10,12 @@ import {
   StatusBar,
   StyleSheet,
   Platform,
-} 
-from 'react-native';
+  ScrollView,
+}
+  from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Button from '../components/Button';
 import { useRouter } from 'expo-router';
-import Account from '../components/Account';
 import { supabase } from '../lib/supabase';
 import ProfileSetupModal from '../components/ProfileSetupModal';
 import CreateFolderModal from '../components/CreateFolderModal';
@@ -60,27 +60,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     height: 48,
   },
-  settingsButton: {
-    position: 'absolute',
-    right: 16,
-  },
   folderListContainer: {
-    ...Platform.select({
-      web: {
-        width: '60%',
-        alignSelf: 'center',
-        marginTop: 16,
-      },
-      default: {
-        width: '95%',
-        marginTop: 16,
-      }
-    }),
+    width: Platform.OS === 'web' ? '60%' : '95%',
+    alignSelf: 'center',
+    marginTop: 16,
+  },
+  createFolderContainer: {
+    position: 'absolute',
+    bottom: 100,
+    left: 0,
+    right: 0,
+    padding: 20,
+    alignItems: 'center',
+
+  },
+  createFolderButton: {
+    width: 160,
+  },
+  folderList: {
+    paddingBottom: 128,
+  },
+  webScrollContainer: {
+    maxHeight: 600,
   },
 });
 
 export default function HomeScreen({ session }: HomeScreenProps) {
-  const [showAccount, setShowAccount] = useState(false);
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [folders, setFolders] = useState<Folder[]>([]);
@@ -101,13 +106,13 @@ export default function HomeScreen({ session }: HomeScreenProps) {
   const getProfile = async () => {
     try {
       setLoading(true);
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('username')
-      .eq('id', session.user.id)
-      .single();
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', session.user.id)
+        .single();
 
-    if (error) {
+      if (error) {
         throw error;
       }
 
@@ -137,12 +142,6 @@ export default function HomeScreen({ session }: HomeScreenProps) {
       console.error('Error fetching folders:', error);
     }
   };
-
-  if (showAccount) {
-    return <Account session={session} onBack={() => setShowAccount(false)} />;
-  }
-
-
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -188,23 +187,68 @@ export default function HomeScreen({ session }: HomeScreenProps) {
             />
           </View>
         </View>
-        
-        <TouchableOpacity
-          onPress={() => setShowAccount(true)}
-          style={styles.settingsButton}
-        >
-          <Ionicons name="settings-outline" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
+
       </View>
 
       {/* Content Container */}
-      <View className="flex-1 items-center px-4">
-        <View style={styles.folderListContainer}>
-          {/* Folder List */}
+      <View style={styles.folderListContainer}>
+        {Platform.OS === 'web' ? (
+          <ScrollView style={styles.webScrollContainer}>
+            <FlatList
+              data={folders}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.folderList}
+              ListEmptyComponent={renderEmptyState}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  className="rounded-xl p-4 mb-3"
+                  style={{
+                    backgroundColor: "#374151",
+                    shadowColor: "#D1D5DB",
+                    shadowOffset: {
+                      width: 0,
+                      height: 5,
+                    },
+                    shadowOpacity: 0.5,
+                    shadowRadius: 0,
+                    elevation: 8,
+                  }}
+                  onPress={() => router.push(`/folder/${item.name}` as any)}
+                >
+                  <View className="flex-row justify-between items-center">
+                    <View className="flex-1">
+                      <Text className="text-white font-medium text-lg">
+                        {item.name}
+                      </Text>
+                      {item.description && (
+                        <Text className="text-white text-sm mt-1">
+                          {item.description}
+                        </Text>
+                      )}
+                      <Text className="text-white text-sm mt-1">
+                        Created {new Date(item.created_at).toLocaleDateString()}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        handleDeleteFolder(item.id);
+                      }}
+                      className="p-2"
+                    >
+                      <Ionicons name="trash-outline" size={24} color="#EF4444" />
+                    </TouchableOpacity>
+                  </View>
+                </TouchableOpacity>
+              )}
+              scrollEnabled={false}
+            />
+          </ScrollView>
+        ) : (
           <FlatList
             data={folders}
             keyExtractor={(item) => item.id}
-            contentContainerClassName="w-full pb-24"
+            contentContainerStyle={styles.folderList}
             ListEmptyComponent={renderEmptyState}
             renderItem={({ item }) => (
               <TouchableOpacity
@@ -249,12 +293,12 @@ export default function HomeScreen({ session }: HomeScreenProps) {
               </TouchableOpacity>
             )}
           />
-        </View>
+        )}
       </View>
 
       {/* Create Folder Button - Fixed at bottom */}
-      <View className="absolute bottom-8 left-0 right-0 p-4 items-center bg-[#1F2937] z-10">
-        <View className="w-40">
+      <View style={styles.createFolderContainer}>
+        <View style={styles.createFolderButton}>
           <Button
             label="CREATE A FOLDER"
             onPress={() => setShowCreateFolder(true)}

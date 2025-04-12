@@ -4,6 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import AddContentModal from '@/components/AddContentModal';
+import TextInputModal from '@/components/TextInputModal';
+import NoteSummaryModal from '@/components/NoteSummaryModal';
 
 interface Note {
   id: string;
@@ -22,7 +24,10 @@ export default function FolderScreen() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showTextModal, setShowTextModal] = useState(false);
   const [userId, setUserId] = useState<string>('');
+  const [folderId, setFolderId] = useState<string>('');
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 
   useEffect(() => {
     fetchNotes();
@@ -40,6 +45,7 @@ export default function FolderScreen() {
         .single();
 
       if (!folder) return;
+      setFolderId(folder.id);
 
       const { data, error } = await supabase
         .from('notes')
@@ -54,40 +60,7 @@ export default function FolderScreen() {
     }
   };
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
 
-    try {
-      setLoading(true);
-      const { data: folder } = await supabase
-        .from('folders')
-        .select('id')
-        .eq('name', name)
-        .single();
-
-      if (!folder) throw new Error('Folder not found');
-
-      const { error } = await supabase
-        .from('notes')
-        .insert([
-          {
-            title: 'New Note',
-            content: input.trim(),
-            source_type: 'text',
-            folder_id: folder.id,
-            user_id: userId
-          }
-        ]);
-
-      if (error) throw error;
-      setInput('');
-      fetchNotes();
-    } catch (error) {
-      console.error('Error sending note:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSelectType = (type: 'text' | 'audio' | 'youtube' | 'file') => {
     setShowAddModal(false);
@@ -104,16 +77,20 @@ export default function FolderScreen() {
   };
 
   const renderNote = ({ item }: { item: Note }) => (
-    <View className="bg-[#1F2937] border border-gray-300 rounded-xl p-4 mb-3">
-      <Text className="text-white font-bold">{item.title}</Text>
-      <Text className="text-white mt-2">{item.content}</Text>
-      {item.summary && (
-        <Text className="text-gray-400 text-sm mt-2">{item.summary}</Text>
-      )}
-      <Text className="text-gray-300 text-xs mt-2">
-        {new Date(item.created_at).toLocaleString()}
-      </Text>
-    </View>
+    <TouchableOpacity
+      onPress={() => setSelectedNote(item)}
+    >
+      <View className="bg-[#1F2937] border border-gray-300 rounded-xl p-4 mb-3">
+        <View className="flex-row justify-between items-center">
+          <Text className="text-white font-bold">{item.title || 'Untitled Note'}</Text>
+          <Text className="text-gray-400 text-xs">
+          </Text>
+        </View>
+        <Text className="text-white mt-2" numberOfLines={2}>
+          {item.content}
+        </Text>
+      </View>
+    </TouchableOpacity>
   );
 
   const renderEmptyState = () => (
@@ -125,7 +102,7 @@ export default function FolderScreen() {
         Add your first content to get started
       </Text>
       <View className="flex-row flex-wrap justify-center gap-4">
-      <TouchableOpacity
+        <TouchableOpacity
           className="bg-[#374151] p-4 rounded-xl items-center w-40"
           onPress={() => handleSelectType('file')}
         >
@@ -134,7 +111,7 @@ export default function FolderScreen() {
         </TouchableOpacity>
         <TouchableOpacity
           className="bg-[#374151] p-4 rounded-xl items-center w-40"
-          onPress={() => handleSelectType('text')}
+          onPress={() => setShowTextModal(true)}
         >
           <Ionicons name="document-text" size={32} color="#FFFFFF" />
           <Text className="text-white mt-2">Text</Text>
@@ -189,7 +166,7 @@ export default function FolderScreen() {
             >
               <Ionicons name="add" size={24} color="white" />
             </TouchableOpacity>
-            
+
             <TextInput
               className="flex-1 bg-gray-800 text-white rounded-xl px-4 py-3"
               placeholder="Type a message..."
@@ -198,9 +175,8 @@ export default function FolderScreen() {
               onChangeText={setInput}
               multiline
             />
-            
+
             <TouchableOpacity
-              onPress={handleSend}
               disabled={loading || !input.trim()}
               className="bg-sky-500 p-3 rounded-xl"
             >
@@ -215,6 +191,22 @@ export default function FolderScreen() {
         onClose={() => setShowAddModal(false)}
         folderName={name as string}
         userId={userId}
+      />
+
+      <TextInputModal
+        visible={showTextModal}
+        onClose={() => setShowTextModal(false)}
+        onSend={() => fetchNotes()}
+        folderId={folderId}
+        userId={userId}
+      />
+
+      <NoteSummaryModal
+        visible={!!selectedNote}
+        onClose={() => setSelectedNote(null)}
+        title={selectedNote?.title || ''}
+        content={selectedNote?.content || ''}
+        summary={selectedNote?.summary || ''}
       />
     </View>
   );
