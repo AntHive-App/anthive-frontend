@@ -118,14 +118,14 @@ export default function AddContentModal({ visible, onClose, folderName, userId }
                 >
                   <Text className="text-white text-center">YouTube</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   className={`flex-1 p-3 rounded-lg ${
                     linkType === 'drive' ? 'bg-blue-500' : 'bg-[#374151]'
                   }`}
                   onPress={() => setLinkType('drive')}
                 >
                   <Text className="text-white text-center">Google Drive</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
               <TextInput
                 className="bg-[#374151] rounded-lg p-4 text-white mb-4"
@@ -143,7 +143,7 @@ export default function AddContentModal({ visible, onClose, folderName, userId }
             </View>
 
             {/* Audio Section */}
-            <View className="mb-6">
+            {/* <View className="mb-6">
               <Text className="text-white text-lg font-semibold mb-4">Audio</Text>
               <View className="flex-row space-x-4">
                 <TouchableOpacity
@@ -169,7 +169,7 @@ export default function AddContentModal({ visible, onClose, folderName, userId }
                   </Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </View> */}
           </ScrollView>
         </View>
       </View>

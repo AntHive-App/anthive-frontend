@@ -159,7 +159,7 @@ export default function HomeScreen({ session }: HomeScreenProps) {
 
   const renderEmptyState = () => (
     <View className="flex-1 justify-center items-center px-4">
-      <Text className="text-gray-500 text-lg text-center mb-2">
+      <Text className="text-gray-400 text-lg text-center mb-2">
         No folders yet
       </Text>
       <Text className="text-gray-400 text-center mb-8">
@@ -203,15 +203,7 @@ export default function HomeScreen({ session }: HomeScreenProps) {
                 <TouchableOpacity
                   className="rounded-xl p-4 mb-3"
                   style={{
-                    backgroundColor: "#374151",
-                    shadowColor: "#D1D5DB",
-                    shadowOffset: {
-                      width: 0,
-                      height: 5,
-                    },
-                    shadowOpacity: 0.5,
-                    shadowRadius: 0,
-                    elevation: 8,
+                    backgroundColor: "#374151"
                   }}
                   onPress={() => router.push(`/folder/${item.name}` as any)}
                 >
@@ -226,7 +218,7 @@ export default function HomeScreen({ session }: HomeScreenProps) {
                         </Text>
                       )}
                       <Text className="text-white text-sm mt-1">
-                        Created {new Date(item.created_at).toLocaleDateString()}
+                        
                       </Text>
                     </View>
                     <TouchableOpacity
@@ -254,15 +246,7 @@ export default function HomeScreen({ session }: HomeScreenProps) {
               <TouchableOpacity
                 className="rounded-xl p-4 mb-3"
                 style={{
-                  backgroundColor: "#374151",
-                  shadowColor: "#D1D5DB",
-                  shadowOffset: {
-                    width: 0,
-                    height: 5,
-                  },
-                  shadowOpacity: 0.5,
-                  shadowRadius: 0,
-                  elevation: 8,
+                  backgroundColor: "#374151"
                 }}
                 onPress={() => router.push(`/folder/${item.name}` as any)}
               >
@@ -277,7 +261,7 @@ export default function HomeScreen({ session }: HomeScreenProps) {
                       </Text>
                     )}
                     <Text className="text-white text-sm mt-1">
-                      Created {new Date(item.created_at).toLocaleDateString()}
+                   
                     </Text>
                   </View>
                   <TouchableOpacity

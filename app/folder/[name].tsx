@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
@@ -76,17 +76,14 @@ export default function FolderScreen() {
   const renderNote = ({ item }: { item: Note }) => (
     <TouchableOpacity
       onPress={() => setSelectedNote(item)}
+      className="bg-[#374151] border border-gray-700 rounded-xl p-4 mb-3"
     >
-      <View className="bg-[#1F2937] border border-gray-300 rounded-xl p-4 mb-3">
-        <View className="flex-row justify-between items-center">
-          <Text className="text-white font-bold">{item.title || 'Untitled Note'}</Text>
-          <Text className="text-gray-400 text-xs">
-          </Text>
-        </View>
-        <Text className="text-white mt-2" numberOfLines={2}>
-          {item.content}
-        </Text>
+      <View className="flex-row justify-between items-center">
+        <Text className="text-white font-bold">{item.title || 'Untitled Note'}</Text>
       </View>
+      <Text className="text-gray-300 mt-2" numberOfLines={2}>
+        {item.content}
+      </Text>
     </TouchableOpacity>
   );
 
@@ -133,9 +130,9 @@ export default function FolderScreen() {
 
   return (
     <View className="flex-1 bg-[#1F2937]">
-      <View className="flex-row items-center justify-between p-4 ">
+      <View className="flex-row items-center justify-between p-4">
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.push('/')}
           className="bg-gray-800 p-2 rounded-xl"
         >
           <Ionicons name="arrow-back" size={24} color="white" />
@@ -149,7 +146,11 @@ export default function FolderScreen() {
           data={notes}
           renderItem={renderNote}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{ padding: 16 }}
+          contentContainerStyle={{
+            width: Platform.OS === 'web' ? '60%' : '95%',
+            alignSelf: 'center',
+            padding: 16,
+          }}
           ListEmptyComponent={renderEmptyState}
         />
       </View>

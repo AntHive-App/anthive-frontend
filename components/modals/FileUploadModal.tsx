@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, Modal, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, Modal, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
-import * as ImageManipulator from 'expo-image-manipulator';
+import * as ImagePicker from 'expo-image-picker';
+import { ImageManipulator } from 'expo-image-manipulator';
+import * as mammoth from 'mammoth';
 import { api } from '@/lib/services/api';
 
 interface FileUploadModalProps {
@@ -28,6 +30,7 @@ const ALLOWED_FILE_TYPES = [
 export default function FileUploadModal({ visible, onClose, folderId, userId, onUploadComplete }: FileUploadModalProps) {
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<DocumentPicker.DocumentPickerResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const pickDocument = async () => {
     try {
@@ -58,7 +61,7 @@ export default function FileUploadModal({ visible, onClose, folderId, userId, on
     }
   };
 
-  const convertImageToJPG = async (fileUri: string) => {
+  const convertFileToJPG = async (fileUri: string) => {
     try {
       const result = await ImageManipulator.manipulateAsync(
         fileUri,
@@ -75,32 +78,128 @@ export default function FileUploadModal({ visible, onClose, folderId, userId, on
     }
   };
 
+  const extractWordText = async (fileUri: string): Promise<string> => {
+    try {
+      const response = await fetch(fileUri);
+      const arrayBuffer = await response.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      console.log('Extracted Word text:', result.value);
+      return result.value;
+    } catch (error) {
+      console.error('Error extracting Word text:', error);
+      throw new Error('Failed to extract text from Word document');
+    }
+  };
+
+  const extractPowerPointText = async (fileUri: string): Promise<string> => {
+    try {
+      // Convert file URI to blob
+      const response = await fetch(fileUri);
+      const blob = await response.blob();
+      
+      // Create form data with the required payload
+      const formData = new FormData();
+      formData.append('file', blob);
+      formData.append('user_id', userId);
+      formData.append('folder_id', folderId);
+      formData.append('source_type', 'file');
+      
+      // Send to PowerPoint processing API
+      const pptResponse = await fetch('http://localhost:8001/process-ppt', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!pptResponse.ok) {
+        throw new Error('Failed to process PowerPoint file');
+      }
+      
+      // Return empty string since we're not extracting text
+      return '';
+    } catch (error) {
+      console.error('Error processing PowerPoint:', error);
+      throw new Error('Failed to process PowerPoint file');
+    }
+  };
+
   const processFile = async () => {
     if (!selectedFile?.assets?.[0]) return;
 
     try {
       setUploading(true);
+      setError(null);
 
       const file = selectedFile.assets[0];
+      const mimeType = file.mimeType || '';
       let extractedText = '';
 
-      const mimeType = file.mimeType || '';
-      
       if (mimeType === 'application/pdf') {
-        // Convert PDF to image and use Textract
-        const imageUri = await convertImageToJPG(file.uri);
-        extractedText = await api.extractText(imageUri, 'pdf');
+        // Convert file to blob
+        const response = await fetch(file.uri);
+        const blob = await response.blob();
+        
+        // Create form data with the required payload
+        const formData = new FormData();
+        formData.append('content', blob);
+        formData.append('user_id', userId);
+        formData.append('folder_id', folderId);
+        formData.append('source_type', 'file');
+        
+        // Send to PDF processing API
+        const pdfResponse = await fetch('http://localhost:8001/process-pdf', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!pdfResponse.ok) {
+          throw new Error('Failed to process PDF file');
+        }
+
+        // Close modal after successful upload
+        onUploadComplete();
+        onClose();
+        return;
+      } else if (mimeType === 'application/vnd.ms-powerpoint' || 
+                 mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
+        // Convert file to blob
+        const response = await fetch(file.uri);
+        const blob = await response.blob();
+        
+        // Create form data with the required payload
+        const formData = new FormData();
+        formData.append('file', blob);
+        formData.append('user_id', userId);
+        formData.append('folder_id', folderId);
+        formData.append('source_type', 'file');
+        
+        // Send to PowerPoint processing API
+        const pptResponse = await fetch('http://localhost:8001/process-ppt', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!pptResponse.ok) {
+          throw new Error('Failed to process PowerPoint file');
+        }
+
+        // Close modal after successful upload
+        onUploadComplete();
+        onClose();
+        return;
       } else if (mimeType.startsWith('image/')) {
         // Convert image to JPG and use Textract
-        const jpgUri = await convertImageToJPG(file.uri);
+        const jpgUri = await convertFileToJPG(file.uri);
         extractedText = await api.extractText(jpgUri, 'image');
+      } else if (mimeType === 'application/msword' || 
+                 mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        // Extract text from Word document
+        extractedText = await extractWordText(file.uri);
       } else {
-        // For office documents, we'll need to implement a different text extraction method
-        // For now, we'll just use the file name as content
-        extractedText = `File: ${file.name}\n\nNote: Office document text extraction is not yet implemented.`;
+        setError('Unsupported file type');
+        return;
       }
 
-      // Send the extracted text to the API
+      // Send the extracted text to the API (only for non-PDF and non-PPT files)
       await api.processNote({
         title: file.name,
         content: extractedText,
@@ -113,11 +212,7 @@ export default function FileUploadModal({ visible, onClose, folderId, userId, on
       onClose();
     } catch (error) {
       console.error('Error processing file:', error);
-      Alert.alert(
-        'Error',
-        'Failed to process the file. Please try again.',
-        [{ text: 'OK' }]
-      );
+      setError('Failed to process the file. Please try again.');
     } finally {
       setUploading(false);
       setSelectedFile(null);
@@ -149,7 +244,7 @@ export default function FileUploadModal({ visible, onClose, folderId, userId, on
                 <Ionicons name="cloud-upload-outline" size={32} color="#FFFFFF" />
                 <Text className="text-white mt-2">Select File</Text>
                 <Text className="text-gray-400 text-center text-sm mt-2">
-                  Supported formats: PDF, JPEG, PNG, HEIF, HEIC, Word, PowerPoint
+                  Supported formats: PDF, Word, PowerPoint
                 </Text>
               </TouchableOpacity>
             ) : (
