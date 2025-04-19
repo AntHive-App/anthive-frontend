@@ -85,7 +85,7 @@ export default function CreateFolderModal({ visible, onClose, userId }: CreateFo
       onRequestClose={onClose}
     >
       <View className="flex-1 justify-center items-center bg-black/50">
-        <View className="bg-white rounded-lg p-4 w-11/12 max-w-sm -mt-20">
+        <View className="bg-white rounded-lg p-4 w-11/12 max-w-sm -mt-40">
           <Text className="text-2xl font-bold text-gray-900 mb-2">Create New Folder</Text>
           <Text className="text-gray-600 mb-4">
             Enter the details for your new folder
@@ -115,7 +115,8 @@ export default function CreateFolderModal({ visible, onClose, userId }: CreateFo
               value={description}
               onChangeText={setDescription}
               multiline
-              numberOfLines={3}
+              style={{ maxHeight: 80 }}
+              scrollEnabled
             />
           </View>
 

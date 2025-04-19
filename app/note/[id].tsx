@@ -97,7 +97,7 @@ export default function NoteScreen() {
       </View>
 
       {/* Action Buttons */}
-      <View className="flex-row justify-around p-4 border-b border-gray-700">
+      <View className="flex-row justify-around p-2 border-b border-gray-700">
       <TouchableOpacity
           className="bg-[#374151] p-4 rounded-xl items-center w-28"
           onPress={handleGenerateFlashcards}

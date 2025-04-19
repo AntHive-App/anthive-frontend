@@ -196,7 +196,7 @@ export default function FileUploadModal({ visible, onClose, folderId, userId, on
       onRequestClose={onClose}
     >
       <View className="flex-1 justify-center items-center bg-black/50">
-        <View className="bg-[#1F2937] rounded-lg p-6 w-11/12 max-w-md">
+        <View className="bg-[#1F2937] rounded-lg p-6 w-11/12 max-w-md -mt-20">
           <View className="flex-row items-center justify-between mb-6">
             <Text className="text-white text-xl font-bold">Upload File</Text>
             <TouchableOpacity onPress={onClose}>

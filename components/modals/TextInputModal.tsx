@@ -47,7 +47,7 @@ export default function TextInputModal({ visible, onClose, onSend, folderId, use
             onRequestClose={onClose}
         >
             <View className="flex-1 justify-center items-center bg-black/50">
-                <View className="bg-[#1F2937] rounded-lg p-6 w-11/12 max-w-md">
+                <View className="bg-[#1F2937] rounded-lg p-6 w-11/12 max-w-md -mt-20">
                     <View className="flex-row items-center justify-between mb-6">
                         <Text className="text-white text-xl font-bold">Add Text</Text>
                         <TouchableOpacity onPress={onClose}>
@@ -62,7 +62,8 @@ export default function TextInputModal({ visible, onClose, onSend, folderId, use
                         value={text}
                         onChangeText={setText}
                         multiline
-                        numberOfLines={4}
+                        style={{ maxHeight: 120 }}
+                        scrollEnabled
                     />
 
                     <TouchableOpacity
