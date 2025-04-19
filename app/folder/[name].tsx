@@ -75,7 +75,10 @@ export default function FolderScreen() {
 
   const renderNote = ({ item }: { item: Note }) => (
     <TouchableOpacity
-      onPress={() => setSelectedNote(item)}
+      onPress={() => router.push({
+        pathname: '/note/[id]',
+        params: { id: item.id }
+      })}
       className="bg-[#374151] border border-gray-700 rounded-xl p-4 mb-3"
     >
       <View className="flex-row justify-between items-center">

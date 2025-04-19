@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
-import * as ImagePicker from 'expo-image-picker';
 import { ImageManipulator } from 'expo-image-manipulator';
 import * as mammoth from 'mammoth';
 import { api } from '@/lib/services/api';
@@ -91,36 +90,6 @@ export default function FileUploadModal({ visible, onClose, folderId, userId, on
     }
   };
 
-  const extractPowerPointText = async (fileUri: string): Promise<string> => {
-    try {
-      // Convert file URI to blob
-      const response = await fetch(fileUri);
-      const blob = await response.blob();
-      
-      // Create form data with the required payload
-      const formData = new FormData();
-      formData.append('file', blob);
-      formData.append('user_id', userId);
-      formData.append('folder_id', folderId);
-      formData.append('source_type', 'file');
-      
-      // Send to PowerPoint processing API
-      const pptResponse = await fetch('http://localhost:8001/process-ppt', {
-        method: 'POST',
-        body: formData,
-      });
-      
-      if (!pptResponse.ok) {
-        throw new Error('Failed to process PowerPoint file');
-      }
-      
-      // Return empty string since we're not extracting text
-      return '';
-    } catch (error) {
-      console.error('Error processing PowerPoint:', error);
-      throw new Error('Failed to process PowerPoint file');
-    }
-  };
 
   const processFile = async () => {
     if (!selectedFile?.assets?.[0]) return;
