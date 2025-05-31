@@ -114,6 +114,7 @@ export default function FileUploadModal({ visible, onClose, folderId, userId, on
         formData.append('folder_id', folderId);
         formData.append('source_type', 'file');
         
+        
         // Send to PDF processing API
         const pdfResponse = await fetch('http://localhost:8001/process-pdf', {
           method: 'POST',
