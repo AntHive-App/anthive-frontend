@@ -17,11 +17,21 @@ export default function SignIn({ onSwitchToSignUp }: SignInProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSignIn = async () => {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) Alert.alert(error.message);
+    setError('');
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    if (signInError) {
+      if (signInError.message.includes('Invalid login credentials')) {
+        setError('Invalid email or password');
+      } else if (signInError.message.includes('fetch') || signInError.message.includes('network')) {
+        setError('Server is down. Please try again later.');
+      } else {
+        setError('An error occurred. Please try again.');
+      }
+    }
     setLoading(false);
   };
 
@@ -29,6 +39,12 @@ export default function SignIn({ onSwitchToSignUp }: SignInProps) {
     <View className="w-full max-w-md">
       <Text className="text-white text-3xl font-bold">Welcome to AntHive</Text>
       <Text className="text-white mt-1 mb-8">Create notes and collaborate with friends</Text>
+
+      {error && (
+        <Text className="text-red-500 text-sm mb-4">
+          {error}
+        </Text>
+      )}
 
       <View className="mt-5">
         <Text className="text-gray-600 text-xs font-bold mb-1">EMAIL ADDRESS</Text>
@@ -76,4 +92,4 @@ export default function SignIn({ onSwitchToSignUp }: SignInProps) {
       </View>
     </View>
   );
-} 
+};
